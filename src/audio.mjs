@@ -15,7 +15,7 @@ export class Narrator {
   this.onStatus('speaking');
   for(let i=0;i<sentences.length;i++){
    if(generation!==this.generation)return false;
-   const ok=await new Promise(resolve=>{const utterance=new SpeechSynthesisUtterance(sentences[i]);utterance.voice=voice;utterance.lang=voice.lang;utterance.rate=settings.slow?0.72:0.9;this.pending=resolve;onSentence(i);utterance.onend=()=>{this.pending=null;resolve(true);};utterance.onerror=()=>{this.pending=null;resolve(false);};speechSynthesis.speak(utterance);});
+   const ok=await new Promise(resolve=>{const utterance=new SpeechSynthesisUtterance(sentences[i]);utterance.voice=voice;utterance.lang=voice.lang;utterance.rate=settings.slow?0.72:0.9;this.pending=resolve;onSentence(i);utterance.onend=()=>{if(this.pending===resolve)this.pending=null;resolve(true);};utterance.onerror=()=>{if(this.pending===resolve)this.pending=null;resolve(false);};speechSynthesis.speak(utterance);});
    if(!ok||generation!==this.generation){if(generation===this.generation)this.onStatus('The voice stopped. Tap Listen to try again, or read together.');return false;}
   }this.onStatus('idle');return true;
  }
@@ -29,9 +29,9 @@ export class LocalRecorder {
   try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});if(generation!==this.generation){stream.getTracks().forEach(t=>t.stop());return;}
    this.stream=stream;const chunks=[];const r=new MediaRecorder(stream);this.recorder=r;
    r.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
-   r.onstop=()=>{stream.getTracks().forEach(t=>t.stop());clearTimeout(this.timer);if(generation===this.generation&&chunks.length){this.url=URL.createObjectURL(new Blob(chunks,{type:r.mimeType}));this.onStatus('ready');}};
-   r.onerror=()=>{this.clear();this.onStatus('Recording stopped. You can try again or keep playing.');};r.start();this.onStatus('recording');this.timer=setTimeout(()=>this.stop(),30000);
-  }catch{this.onStatus('The microphone is unavailable or permission was declined. You can still practice and finish.');}
+   r.onstop=()=>{stream.getTracks().forEach(t=>t.stop());if(generation===this.generation){clearTimeout(this.timer);if(chunks.length){this.url=URL.createObjectURL(new Blob(chunks,{type:r.mimeType}));this.onStatus('ready');}}};
+   r.onerror=()=>{if(generation===this.generation){this.clear();this.onStatus('Recording stopped. You can try again or keep playing.');}};r.start();this.onStatus('recording');this.timer=setTimeout(()=>this.stop(),30000);
+  }catch{if(generation===this.generation){this.clear();this.onStatus('The microphone is unavailable or permission was declined. You can still practice and finish.');}}
  }
  stop(){if(this.recorder?.state==='recording')this.recorder.stop();this.stream?.getTracks().forEach(t=>t.stop());clearTimeout(this.timer);}
  clear(){this.generation++;this.stop();if(this.url)URL.revokeObjectURL(this.url);this.url=null;this.stream=null;this.recorder=null;}

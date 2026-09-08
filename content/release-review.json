@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "checks": {
+    "languageAndStoryCoherence": {"status": "pending", "evidence": []},
+    "animalFacts": {"status": "partial", "evidence": ["docs/CONTENT_REVIEW.md"]},
+    "phonicsSequenceAndPrerequisites": {"status": "pending", "evidence": []},
+    "scriptAudioAndDuration": {"status": "pending", "evidence": []},
+    "pictureMeaningAndStoryConsistency": {"status": "pending", "evidence": []},
+    "missionAndModeVariety": {"status": "pending", "evidence": []},
+    "responsiveKeyboardAndContrast": {"status": "partial", "evidence": ["docs/VALIDATION.md"]},
+    "physicalDeviceAudioTouchAndInterruptions": {"status": "pending", "evidence": []},
+    "learnerUsability": {"status": "pending", "evidence": []},
+    "longTermStorageAndMigration": {"status": "pending", "evidence": []},
+    "chapterPackLoading": {"status": "pending", "evidence": []}
+  }
+}

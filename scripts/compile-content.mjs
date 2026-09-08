@@ -2,6 +2,8 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {scripts} from '../content/story-scripts.mjs';
 import {glossGroups,pictograms,coreExamples,phonics} from '../content/word-support.mjs';
 import {beaverQuestions} from '../content/beaver-questions.mjs';
+import {authoredQuestions} from '../content/authored-questions.mjs';
+import {additionalExamples} from '../content/word-examples.mjs';
 const spec = await readFile('docs/Kids_Place_Game_Concept.md','utf8');
 const appendix = spec.split('## Appendix A')[1].split('## Appendix B')[0];
 const rows = appendix.split('\n').filter(x=>/^\| (?:\d{2} —|[1-6] \|)/.test(x));
@@ -29,7 +31,7 @@ scripts.forEach(([title,focus,triples],i)=>{
   const pages=triples.map((parts,p)=>({id:`${versionId}-p${p+1}`,text:parts.slice(0,t+1).join(' '),sentences:parts.slice(0,t+1),art:story.illustration,audio:null,reviewStatus:'draft'}));
   const version={id:versionId,tier,pages,readAloud:true,independentlyDecodable:false,questionIds:[]};
   story.versions.push(version);
-  if(i!==14) pages.forEach((page,p)=>{
+  if(i!==14&&!authoredQuestions[id]) pages.forEach((page,p)=>{
     const candidate=words.find(w=>story.focusWordIds.includes(w.id)&&hasWord(page.text,w.id))||words.find(w=>w.chapterId===chapter.id&&hasWord(page.text,w.id))||words.find(w=>w.id==='friend'&&hasWord(page.text,w.id))||wordMap.look;
     let prompt,answer,options,kind;
     if(hasWord(page.text,candidate.id)){
@@ -45,11 +47,17 @@ scripts.forEach(([title,focus,triples],i)=>{
     questions.push(q);version.questionIds.push(q.id);
   });
  });
- if(i!==14) for(const [k,t,p,prompt] of [[19,0,0,'What happens first in this story?'],[20,2,5,'What happens at the end of this story?']]){
+ if(i!==14&&!authoredQuestions[id]) for(const [k,t,p,prompt] of [[19,0,0,'What happens first in this story?'],[20,2,5,'What happens at the end of this story?']]){
   const v=story.versions[t];const q={id:`${id}-q${k}`,storyId:id,storyVersionId:v.id,evidencePageIds:[v.pages[p].id],targetWordIds:[],prerequisites:[],skill:'comprehension',kind:'sequence',prompt,answer:v.pages[p].sentences[0],options:[v.pages[p].sentences[0],v.pages[p===0?5:0].sentences[0]],feedback:`Listen to page ${p+1}. ${v.pages[p].text}`,authorship:'mechanically-derived-draft',reviewStatus:'draft'};questions.push(q);v.questionIds.push(q.id);
  }
  if(i===14) beaverQuestions.forEach(([tier,p,prompt,answer,wrong,target],n)=>{
   const v=story.versions[tiers.indexOf(tier)];const q={id:`${id}-authored-${n+1}`,storyId:id,storyVersionId:v.id,evidencePageIds:[v.pages[p].id],targetWordIds:[target].filter(w=>wordMap[w]),prerequisites:[],skill:'comprehension',kind:'detail',prompt,answer,options:[answer,wrong],feedback:`Let’s listen to page ${p+1}. ${v.pages[p].text}`,authorship:'manually-authored',reviewStatus:'draft'};questions.push(q);v.questionIds.push(q.id);
+ });
+ if(authoredQuestions[id]) authoredQuestions[id].forEach(({tier,prompt,answer,wrong,target,page},n)=>{
+  const v=story.versions[tier],p=v.pages[page];
+  if(!p)throw Error(`Invalid authored evidence: ${id}/${tier}/${page}`);
+  const q={id:`${id}-authored-${n+1}`,storyId:id,storyVersionId:v.id,evidencePageIds:[p.id],targetWordIds:wordMap[target]&&hasWord(p.text,target)?[target]:[],prerequisites:[],skill:'comprehension',kind:/^(Why|How has|What helped)/.test(prompt)?'inference':'detail',prompt,answer,options:[answer,wrong],feedback:`Let’s read page ${page+1} again. ${p.text}`,authorship:'manually-authored',reviewStatus:'draft'};
+  questions.push(q);v.questionIds.push(q.id);
  });
  for(const word of words){
   const page=story.versions[2].pages.find(p=>hasWord(p.text,word.id));
@@ -64,7 +72,8 @@ chapters.forEach((c,i)=>{
   const m={id:`${c.id}-${route}`,chapterId:c.id,title:r<2?story.title:r===2?'Explorer field notes':'Build the parade page',storyId,steps:r<2?['safari','story','quiz']:r===2?['listening','detective','speaking']:['phonics','spelling','sentence'],reward:`${c.id}-${route}-sticker`,support:'any'}; missions.push(m);c.missionIds.push(m.id);
  });
 });
-// Never invent examples, reviewed images or sound metadata for incomplete entries.
+for(const word of words) if(!word.example) word.example=additionalExamples[word.id]||null;
+// Never fabricate reviewed images or sound metadata for incomplete entries.
 const registry={schemaVersion:1,contentVersion:'2026.09-alpha.1',releaseStatus:'editorial-and-audio-review-required',regions:regions.map((name,id)=>({id,name,icon:regionIcons[id]})),chapters,words,stories,questions,missions,phonics};
 await mkdir('content',{recursive:true});await writeFile('content/catalog.json',JSON.stringify(registry,null,2)+'\n');
 console.log(JSON.stringify({words:words.length,chapters:chapters.length,stories:stories.length,versions:stories.length*3,missions:missions.length,questions:questions.length,manuallyAuthoredQuestions:questions.filter(q=>q.authorship==='manually-authored').length}));
