@@ -1,9 +1,23 @@
 """Run in a Python environment with kokoro==0.9.4, soundfile and espeak-ng.
 Generate reusable speech locally; no API key or cloud speech requests.
 """
-import hashlib,json,pathlib,subprocess
+import hashlib,json,pathlib,platform,subprocess
 import numpy as np
 import soundfile as sf
+
+# The macOS espeakng-loader wheel can retain its CI build-time data path. Prefer
+# the system installation when Homebrew provides one.
+if platform.system() == 'Darwin':
+ import espeakng_loader
+ prefix=subprocess.run(
+  ['brew','--prefix','espeak-ng'],capture_output=True,text=True,check=False
+ ).stdout.strip()
+ library=pathlib.Path(prefix)/'lib/libespeak-ng.dylib'
+ data=pathlib.Path(prefix)/'share/espeak-ng-data'
+ if library.exists() and data.exists():
+  espeakng_loader.get_library_path=lambda: str(library)
+  espeakng_loader.get_data_path=lambda: str(data)
+
 from kokoro import KPipeline
 root=pathlib.Path(__file__).resolve().parents[1]
 c=json.loads((root/'content/catalog.json').read_text())

@@ -1,5 +1,6 @@
 dist/
 node_modules/
+.venv-kokoro/
 test-results/
 .DS_Store
 content/catalog.json
