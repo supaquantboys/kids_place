@@ -1,0 +1,11 @@
+# Painted playroom visual update
+
+Requested direction: make the entire UI more colorful, child-friendly and painterly.
+
+Implemented in `paint-theme.css`: ivory painted-paper background, a six-color card palette, rounded sticker-like badges, chunky pressable controls and letter tiles, illustrated book covers, framed scene art, a rainbow header trim, paper-like Story Time pages, and coordinated journal, treehouse, parent and dialog surfaces. Learning text, answer semantics, content IDs and saved progress are unchanged. The overlay loads after the original responsive stylesheet.
+
+`assets/painted-paper.webp` is an original image created with the built-in Image Generation tool and optimized to WebP for the app. Original source PNG is retained outside the build. The existing world/beaver/treehouse artwork is preserved.
+
+Generation prompt: “Use case: illustration-story. Asset type: decorative background for Wonderwood Explorer Club, a colorful English learning game for a five-year-old. Create a wide 1536x1024 original hand-painted gouache and watercolor paper background. Warm ivory paper, broad soft translucent washes of butter yellow, peach coral, mint green, lavender and sky blue around the edges. Hand-painted tiny flowers, leaves, a few confetti brush dots and little stars sparsely around the perimeter. Central 65 percent almost blank cream paper so real app UI can be displayed clearly over it. Charming handmade children's picture-book aesthetic, visible subtle pigment and paper grain, bright cheerful daylight. NO words, letters, numbers, logo, interface controls, frames, animals, or border line. Not a UI mockup, purely a production decorative painted paper asset.”
+
+The generated background was visually inspected. Automated checks cover asset inclusion, stylesheet ordering, primary palette/button text contrast, and the presence of focus/reduced-motion/touch-target safeguards. These are not substitutes for a complete rendered UI accessibility review. Browser preview access was blocked by the session's URL policy, so this revision has no fresh browser screenshots or responsive visual acceptance. The previous full-MVP release blockers remain unchanged; this is a visual update on the draft feature PR, not a production publication.
