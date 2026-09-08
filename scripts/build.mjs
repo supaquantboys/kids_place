@@ -1,4 +1,4 @@
-import { mkdir, cp, rm } from 'node:fs/promises';
+import { mkdir, cp, rm, writeFile } from 'node:fs/promises';
 await import('./compile-content.mjs');
 await rm('dist', {recursive:true,force:true});
 await mkdir('dist', {recursive:true});
@@ -8,3 +8,5 @@ await cp('content/catalog.json','dist/content/catalog.json');
 await mkdir('dist/assets');
 for(const name of ['world','beaver','treehouse','painted-paper']) await cp(`assets/${name}.webp`,`dist/assets/${name}.webp`);
 console.log('Static build complete. Relative asset paths support /kids_place/ on GitHub Pages.');
+
+await writeFile('dist/build-info.json', JSON.stringify({sha:process.env.GITHUB_SHA || 'local',channel:'preview'}));
