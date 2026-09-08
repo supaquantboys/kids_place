@@ -32,6 +32,16 @@ for q in c['questions']:
  for option in q['options']:
   texts.add(option)
   texts.add(f"Or {re.sub(r'[.!?]+$','',option)}?")
+for chapter in c['chapters']:
+ texts.add(f"Let’s explore {chapter['title']}. Tap Continue Adventure to begin.")
+for word in c['words']:
+ for written in [word['canonical'],*word.get('variants',{}).values()]:
+  texts.add(f'Find the {written}.')
+for item in c['phonics']:
+ if not item['rhyme']:continue
+ texts.add(f"Which word rhymes with {item['word']}?")
+ for option in [item['rhyme'],item['distractor']]:
+  texts.add(f'Or {option}?')
 texts.update(re.sub(r'\bgray\b','grey',re.sub(r'\bcolor\b','colour',t)) for t in list(texts))
 out=root/'assets/narration';out.mkdir(parents=True,exist_ok=True)
 manifest_path=out/'manifest.json'
