@@ -1,4 +1,5 @@
 import { mkdir, cp, rm } from 'node:fs/promises';
+await import('./compile-content.mjs');
 await rm('dist', {recursive:true,force:true});
 await mkdir('dist', {recursive:true});
 for (const path of ['index.html','app.css','src','content','assets']) await cp(path, `dist/${path}`, {recursive:true});

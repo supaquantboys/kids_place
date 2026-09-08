@@ -1,0 +1,6 @@
+import {readFile} from 'node:fs/promises';
+const c=JSON.parse(await readFile('content/catalog.json','utf8'));
+const versions=c.stories.flatMap(s=>s.versions),pages=versions.flatMap(v=>v.pages);
+const report={status:c.releaseStatus,chapters:c.chapters.length,words:c.words.length,stories:c.stories.length,versions:versions.length,pages:pages.length,missionRoutes:c.missions.length,draftQuizItems:c.questions.length,individuallyAuthoredQuizItems:c.questions.filter(q=>q.authorship==='manually-authored').length,approvedQuizItems:c.questions.filter(q=>q.reviewStatus==='approved').length,missingWordRecordings:c.words.filter(w=>!w.audio.normal||!w.audio.slow).length,missingPageRecordings:pages.filter(p=>!p.audio).length,missingWordExamples:c.words.filter(w=>!w.example).length,approvedWordPictures:c.words.filter(w=>w.imageStatus==='approved').length,distinctIllustrations:new Set(pages.map(p=>p.art)).size,releaseReady:false};
+console.log(JSON.stringify(report,null,2));
+if(process.argv.includes('--release')){console.error('Release blocked: reviewed audio, images, complete phonics/content approval, and actual-device acceptance are not finished. Do not publish this as the full MVP.');process.exitCode=1;}
