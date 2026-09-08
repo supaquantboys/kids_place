@@ -8,7 +8,7 @@ The 600-entry specification inventory contains 480 thematic entries and 120 shar
 
 Forty-eight original scripts have six pages each, with cumulative Sprout, Trail and Ranger support versions: 144 versions and 864 pages. They are read-aloud drafts, not independently decodable passages. Their final narration durations have not been checked and current text is shorter than the duration targets, especially at Ranger level.
 
-Each chapter has four three-step routes, for 96 routes. The field/practice routes use shared structures and still need chapter-specific variety. Authoring questions in source replaces mechanically derived cloze/page-recall drafts; the audit reports the current split. “Individually authored” describes question-specific authoring rather than generation by a template, not human editorial approval.
+Each chapter has four three-step routes, for 96 routes. The field/practice routes use shared structures and still need chapter-specific variety. All 960 question records are now individually authored: 20 per story, distributed as 6 Sprout, 7 Trail and 7 Ranger items. The mechanically derived cloze/page-recall fallback was removed. The bank has detail, comparison, sequence-reasoning and inference prompts, but richer picture/listening/sort interaction types still need implementation and review. “Individually authored” describes question-specific authoring rather than generation by a template, not human editorial approval.
 
 ## Factual checks
 

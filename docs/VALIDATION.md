@@ -4,9 +4,9 @@ Development log, 2026-09-08. This is a playable alpha checkpoint, not full-MVP a
 
 ## Automated evidence
 
-`node scripts/compile-content.mjs` builds the catalog from the unchanged specification inventory and authored source modules. `node --test tests/*.test.mjs` currently passes 38 tests covering content relationships, exact-version question evidence, word examples, separate skills, supported versus independent answers, delayed review, profile isolation, corrupt/quota storage, backup validation, and audio/recording races. `node scripts/build.mjs` succeeds. These tests establish software invariants, not educational effectiveness or factual approval.
+`node scripts/compile-content.mjs` builds the catalog from the unchanged specification inventory and authored source modules. `node --test tests/*.test.mjs` currently passes 39 tests covering content relationships, exact-version question evidence, word examples, separate skills, supported versus independent answers, delayed review, profile isolation, corrupt/quota storage, backup validation, and audio/recording races. `node scripts/build.mjs` succeeds. These tests establish software invariants, not educational effectiveness or factual approval.
 
-GitHub Actions run [34187162007](https://github.com/supaquantboys/kids_place/actions/runs/34187162007) passed checkout, tests and static build for checkpoint `ab3539c584e769a930d59ace98080c3c6fa7373a`. Deployment was skipped, as expected for a PR. Later commits require their own successful checks.
+GitHub Actions run [34187162007](https://github.com/supaquantboys/kids_place/actions/runs/34187162007) passed checkout, tests and static build for checkpoint `ab3539c584e769a930d59ace98080c3c6fa7373a`. Deployment was skipped, as expected for a PR. Run [34210575426](https://github.com/supaquantboys/kids_place/actions/runs/34210575426) also passed for `253ffad588711cda0943b6c049d42cc0a9e02de1`, including an alpha build artifact. Later commits require their own successful checks.
 
 ## Browser observations
 
@@ -20,7 +20,7 @@ The checked-in `tests/responsive.html` harness supports 320, 390, 768, 1024 and 
 
 | Area | Still required |
 | --- | --- |
-| Content | Complete individually authored quiz bank and editorial review; richer story versions meeting recorded duration targets; grammar/phonics word metadata |
+| Content | Editorial review of all 960 individually authored questions, broader quiz interaction types; richer story versions meeting recorded duration targets; grammar/phonics word metadata |
 | Learning modes | Full six-stage phonics sequence; meaningful Nature Detective compare/sort interactions; chapter-specific mission variety and prerequisite checks |
 | Media | Reviewed word pictures, page-specific story art, normal/slow voice and phonics/instruction recordings |
 | Performance/storage | Chapter content packs loaded on demand; long-history compaction/migration validation (the alpha retains at most 20,000 attempts per learner) |

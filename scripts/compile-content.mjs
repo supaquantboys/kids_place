@@ -31,27 +31,10 @@ scripts.forEach(([title,focus,triples],i)=>{
   const pages=triples.map((parts,p)=>({id:`${versionId}-p${p+1}`,text:parts.slice(0,t+1).join(' '),sentences:parts.slice(0,t+1),art:story.illustration,audio:null,reviewStatus:'draft'}));
   const version={id:versionId,tier,pages,readAloud:true,independentlyDecodable:false,questionIds:[]};
   story.versions.push(version);
-  if(i!==14&&!authoredQuestions[id]) pages.forEach((page,p)=>{
-    const candidate=words.find(w=>story.focusWordIds.includes(w.id)&&hasWord(page.text,w.id))||words.find(w=>w.chapterId===chapter.id&&hasWord(page.text,w.id))||words.find(w=>w.id==='friend'&&hasWord(page.text,w.id))||wordMap.look;
-    let prompt,answer,options,kind;
-    if(hasWord(page.text,candidate.id)){
-      const sentence=page.sentences.find(s=>hasWord(s,candidate.id));
-      prompt=`Which word completes this part of the story? ${sentence.replace(new RegExp(`\\b${candidate.id}\\b`,'i'),'___')}`;
-      answer=candidate.canonical;
-      const distractor=words.find(w=>w.chapterId===chapter.id&&w.id!==candidate.id&&!hasWord(sentence,w.id))||wordMap.book;
-      options=[answer,distractor.canonical];kind='cloze';
-    }else{
-      prompt=`Which sentence did we hear on page ${p+1}?`;answer=page.sentences[0];options=[answer,pages[(p+1)%6].sentences[0]];kind='page-recall';
-    }
-    const q={id:`${versionId}-q${p+1}`,storyId:id,storyVersionId:versionId,evidencePageIds:[page.id],targetWordIds:hasWord(page.text,candidate.id)?[candidate.id]:[],prerequisites:[],skill:'comprehension',kind,prompt,answer,options,feedback:`Let’s read page ${p+1} again. ${page.text}`,authorship:'mechanically-derived-draft',reviewStatus:'draft'};
-    questions.push(q);version.questionIds.push(q.id);
-  });
  });
- if(i!==14&&!authoredQuestions[id]) for(const [k,t,p,prompt] of [[19,0,0,'What happens first in this story?'],[20,2,5,'What happens at the end of this story?']]){
-  const v=story.versions[t];const q={id:`${id}-q${k}`,storyId:id,storyVersionId:v.id,evidencePageIds:[v.pages[p].id],targetWordIds:[],prerequisites:[],skill:'comprehension',kind:'sequence',prompt,answer:v.pages[p].sentences[0],options:[v.pages[p].sentences[0],v.pages[p===0?5:0].sentences[0]],feedback:`Listen to page ${p+1}. ${v.pages[p].text}`,authorship:'mechanically-derived-draft',reviewStatus:'draft'};questions.push(q);v.questionIds.push(q.id);
- }
+ if(i!==14&&authoredQuestions[id]?.length!==20)throw Error(`Expected 20 authored questions for ${id}`);
  if(i===14) beaverQuestions.forEach(([tier,p,prompt,answer,wrong,target],n)=>{
-  const v=story.versions[tiers.indexOf(tier)];const q={id:`${id}-authored-${n+1}`,storyId:id,storyVersionId:v.id,evidencePageIds:[v.pages[p].id],targetWordIds:[target].filter(w=>wordMap[w]),prerequisites:[],skill:'comprehension',kind:'detail',prompt,answer,options:[answer,wrong],feedback:`Let’s listen to page ${p+1}. ${v.pages[p].text}`,authorship:'manually-authored',reviewStatus:'draft'};questions.push(q);v.questionIds.push(q.id);
+  const v=story.versions[tiers.indexOf(tier)];const q={id:`${id}-authored-${n+1}`,storyId:id,storyVersionId:v.id,evidencePageIds:[v.pages[p].id],targetWordIds:[target].filter(w=>wordMap[w]&&hasWord(v.pages[p].text,w)),prerequisites:[],skill:'comprehension',kind:'detail',prompt,answer,options:[answer,wrong],feedback:`Let’s listen to page ${p+1}. ${v.pages[p].text}`,authorship:'manually-authored',reviewStatus:'draft'};questions.push(q);v.questionIds.push(q.id);
  });
  if(authoredQuestions[id]) authoredQuestions[id].forEach(({tier,prompt,answer,wrong,target,page},n)=>{
   const v=story.versions[tier],p=v.pages[page];
@@ -74,6 +57,6 @@ chapters.forEach((c,i)=>{
 });
 for(const word of words) if(!word.example) word.example=additionalExamples[word.id]||null;
 // Never fabricate reviewed images or sound metadata for incomplete entries.
-const registry={schemaVersion:1,contentVersion:'2026.09-alpha.1',releaseStatus:'editorial-and-audio-review-required',regions:regions.map((name,id)=>({id,name,icon:regionIcons[id]})),chapters,words,stories,questions,missions,phonics};
+const registry={schemaVersion:1,contentVersion:'2026.09-alpha.2',releaseStatus:'editorial-and-audio-review-required',regions:regions.map((name,id)=>({id,name,icon:regionIcons[id]})),chapters,words,stories,questions,missions,phonics};
 await mkdir('content',{recursive:true});await writeFile('content/catalog.json',JSON.stringify(registry,null,2)+'\n');
 console.log(JSON.stringify({words:words.length,chapters:chapters.length,stories:stories.length,versions:stories.length*3,missions:missions.length,questions:questions.length,manuallyAuthoredQuestions:questions.filter(q=>q.authorship==='manually-authored').length}));
