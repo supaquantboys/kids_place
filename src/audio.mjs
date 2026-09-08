@@ -1,10 +1,23 @@
 // Browser synthesis is a clearly labeled preview fallback, not a reviewed production recording.
 export class Narrator {
  constructor(onStatus=()=>{}){this.onStatus=onStatus;this.generation=0;this.pending=null;this.paused=false;}
- stop(){this.generation++;globalThis.speechSynthesis?.cancel();this.pending?.(false);this.pending=null;this.paused=false;this.onStatus('idle');}
- pause(){if(!globalThis.speechSynthesis)return;this.paused=!this.paused;this.paused?speechSynthesis.pause():speechSynthesis.resume();this.onStatus(this.paused?'paused':'speaking');}
+ stop(){if(this.clip){this.clip.pause();this.clip=null;}this.generation++;globalThis.speechSynthesis?.cancel();this.pending?.(false);this.pending=null;this.paused=false;this.onStatus('idle');}
+ pause(){if(this.clip){this.paused=!this.paused;this.paused?this.clip.pause():this.clip.play().catch(()=>this.stop());this.onStatus(this.paused?'paused':'speaking');return;}if(!globalThis.speechSynthesis)return;this.paused=!this.paused;this.paused?speechSynthesis.pause():speechSynthesis.resume();this.onStatus(this.paused?'paused':'speaking');}
  async speak(sentences,settings,onSentence=()=>{}){
   this.stop();if(!settings.narration){this.onStatus('Narration is off. Read together or turn it on in Parents.');return false;}
+  const saved=sentences.map(s=>this.recordings?.[s]?.path);
+  if(saved.length&&saved.every(path=>/^assets\/narration\/[a-f0-9]{64}\.mp3$/.test(path))&&globalThis.Audio){
+   const generation=this.generation;this.onStatus('speaking');
+   for(let i=0;i<saved.length;i++){
+    if(generation!==this.generation)return false;
+    const clip=new Audio(saved[i]);this.clip=clip;clip.playbackRate=settings.slow?0.8:1;clip.preservesPitch=true;
+    const ok=await new Promise(resolve=>{this.pending=resolve;onSentence(i);clip.onended=()=>resolve(true);clip.onerror=()=>resolve(false);clip.play().catch(()=>resolve(false));});
+    if(generation!==this.generation)return false;
+    this.pending=null;this.clip=null;
+    if(!ok){this.onStatus('Recording could not play. Tap Listen to retry or read together.');return false;}
+   }
+   this.onStatus('idle');return true;
+  }
   if(!globalThis.speechSynthesis||!globalThis.SpeechSynthesisUtterance){this.onStatus('This browser has no voice. You can read together and keep playing.');return false;}
   const generation=this.generation;
   let voices=speechSynthesis.getVoices();
