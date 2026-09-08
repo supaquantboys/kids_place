@@ -1,0 +1,23 @@
+// Manually authored questions, exact tier and evidence. Editorial/audio approval still pending.
+export const beaverQuestions = [
+ ['sprout',0,'What kind of animal is Bea?','beaver','cat','beaver'],
+ ['sprout',1,'What color is Bea’s fur?','brown','blue','brown'],
+ ['sprout',1,'What shape is Bea’s tail?','flat','square','flat'],
+ ['sprout',2,'What is in the water?','stick','hat','stick'],
+ ['sprout',3,'What can Bea do?','swim','read','swim'],
+ ['sprout',4,'Where does Bea take the stick?','dam','school','dam'],
+ ['trail',0,'Where is Bea?','beside the creek','in the classroom','beaver'],
+ ['trail',1,'Which word describes Bea’s tail?','wide','tiny','tail'],
+ ['trail',2,'What floats away?','the stick','the bed','stick'],
+ ['trail',3,'What does Bea bring back?','the stick','the book','stick'],
+ ['trail',4,'What can a dam slow?','water','a clock','dam'],
+ ['trail',5,'What do the explorers draw?','Bea’s tail','a train','tail'],
+ ['trail',5,'Where is the stick at the end?','on the dam','in a bag','stick'],
+ ['ranger',0,'Where do the explorers watch from?','the bank','the roof','bank'],
+ ['ranger',1,'Why do they sketch Bea’s features?','to recognize her again','to choose a coat','fur'],
+ ['ranger',3,'Which body part helps Bea move through the creek?','webbed back feet','ears','foot'],
+ ['ranger',4,'Which structure is a home?','lodge','dam','lodge'],
+ ['ranger',4,'Which structure holds back flowing water?','dam','lodge','dam'],
+ ['ranger',5,'Why do they draw the dam separately?','so they do not confuse it with Bea’s home','so Bea can read the picture','dam'],
+ ['ranger',3,'What does Bea collect after entering the creek?','the stick','a backpack','stick'],
+];

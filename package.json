@@ -1,0 +1,14 @@
+{
+  "name": "wonderwood-explorer-club",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pretest": "node scripts/compile-content.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "audit:content": "node scripts/audit-content.mjs"
+  },
+  "engines": {"node": ">=22"}
+}
