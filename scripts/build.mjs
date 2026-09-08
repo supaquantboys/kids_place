@@ -10,3 +10,5 @@ for(const name of ['world','beaver','treehouse','painted-paper']) await cp(`asse
 console.log('Static build complete. Relative asset paths support /kids_place/ on GitHub Pages.');
 
 await writeFile('dist/build-info.json', JSON.stringify({sha:process.env.GITHUB_SHA || 'local',channel:'preview'}));
+
+try{await cp('assets/narration','dist/assets/narration',{recursive:true});}catch(e){if(e.code!=='ENOENT')throw e;}
