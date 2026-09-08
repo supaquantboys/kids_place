@@ -1,7 +1,7 @@
 """Run in a Python environment with kokoro==0.9.4, soundfile and espeak-ng.
 Generate reusable speech locally; no API key or cloud speech requests.
 """
-import hashlib,json,pathlib,platform,subprocess
+import hashlib,json,pathlib,platform,re,subprocess
 import numpy as np
 import soundfile as sf
 
@@ -27,7 +27,11 @@ for w in c['words']:
 for s in c['stories']:
  for v in s['versions']:
   for p in v['pages']:texts.update(p['sentences'])
-import re
+for q in c['questions']:
+ texts.add(q['prompt'])
+ for option in q['options']:
+  texts.add(option)
+  texts.add(f"Or {re.sub(r'[.!?]+$','',option)}?")
 texts.update(re.sub(r'\bgray\b','grey',re.sub(r'\bcolor\b','colour',t)) for t in list(texts))
 out=root/'assets/narration';out.mkdir(parents=True,exist_ok=True)
 manifest_path=out/'manifest.json'

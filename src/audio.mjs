@@ -3,7 +3,8 @@ export class Narrator {
  constructor(onStatus=()=>{}){this.onStatus=onStatus;this.generation=0;this.pending=null;this.paused=false;}
  stop(){if(this.clip){this.clip.pause();this.clip=null;}this.generation++;globalThis.speechSynthesis?.cancel();this.pending?.(false);this.pending=null;this.paused=false;this.onStatus('idle');}
  pause(){if(this.clip){this.paused=!this.paused;this.paused?this.clip.pause():this.clip.play().catch(()=>this.stop());this.onStatus(this.paused?'paused':'speaking');return;}if(!globalThis.speechSynthesis)return;this.paused=!this.paused;this.paused?speechSynthesis.pause():speechSynthesis.resume();this.onStatus(this.paused?'paused':'speaking');}
- async speak(sentences,settings,onSentence=()=>{}){
+ wait(milliseconds,generation){if(!milliseconds)return Promise.resolve(true);return new Promise(resolve=>{let timer;const finish=ok=>{clearTimeout(timer);if(this.pending===cancel)this.pending=null;resolve(ok&&generation===this.generation);};const cancel=()=>finish(false);timer=setTimeout(()=>finish(true),milliseconds);this.pending=cancel;});}
+ async speak(sentences,settings,onSentence=()=>{},pauseMs=0){
   this.stop();if(!settings.narration){this.onStatus('Narration is off. Read together or turn it on in Parents.');return false;}
   const saved=sentences.map(s=>this.recordings?.[s]?.path);
   if(saved.length&&saved.every(path=>/^assets\/narration\/[a-f0-9]{64}\.mp3$/.test(path))&&globalThis.Audio){
@@ -15,6 +16,7 @@ export class Narrator {
     if(generation!==this.generation)return false;
     this.pending=null;this.clip=null;
     if(!ok){this.onStatus('Recording could not play. Tap Listen to retry or read together.');return false;}
+    if(pauseMs&&i<saved.length-1&&!await this.wait(pauseMs,generation))return false;
    }
    this.onStatus('idle');return true;
   }
@@ -30,6 +32,7 @@ export class Narrator {
    if(generation!==this.generation)return false;
    const ok=await new Promise(resolve=>{const utterance=new SpeechSynthesisUtterance(sentences[i]);utterance.voice=voice;utterance.lang=voice.lang;utterance.rate=settings.slow?0.72:0.9;this.pending=resolve;onSentence(i);utterance.onend=()=>{if(this.pending===resolve)this.pending=null;resolve(true);};utterance.onerror=()=>{if(this.pending===resolve)this.pending=null;resolve(false);};speechSynthesis.speak(utterance);});
    if(!ok||generation!==this.generation){if(generation===this.generation)this.onStatus('The voice stopped. Tap Listen to try again, or read together.');return false;}
+   if(pauseMs&&i<sentences.length-1&&!await this.wait(pauseMs,generation))return false;
   }this.onStatus('idle');return true;
  }
 }
