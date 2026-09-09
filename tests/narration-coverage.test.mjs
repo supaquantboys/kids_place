@@ -18,6 +18,7 @@ test('every chapter audio path resolves to a saved recording',async()=>{
  }
  for(const chapter of catalog.chapters)expected.add(`Let’s explore ${chapter.title}. Tap Continue Adventure to begin.`);
  for(const story of catalog.stories)for(const version of story.versions)for(const page of version.pages)for(const sentence of page.sentences)expected.add(sentence);
+ for(const story of catalog.bedtimeStories)for(const sentence of story.sentences)expected.add(sentence);
  for(const question of catalog.questions)for(const text of choices(question.prompt,question.options))expected.add(text);
  for(const item of catalog.phonics.filter(item=>item.rhyme))for(const text of choices(`Which word rhymes with ${item.word}?`,[item.rhyme,item.distractor]))expected.add(text);
  for(const text of [...expected])expected.add(localized(text));

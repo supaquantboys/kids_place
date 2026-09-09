@@ -27,6 +27,7 @@ for w in c['words']:
 for s in c['stories']:
  for v in s['versions']:
   for p in v['pages']:texts.update(p['sentences'])
+for story in c.get('bedtimeStories',[]):texts.update(story['sentences'])
 for q in c['questions']:
  texts.add(q['prompt'])
  for option in q['options']:
