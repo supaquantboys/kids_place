@@ -1,7 +1,7 @@
 name: Test, build and publish Wonderwood
 on:
   push:
-    branches: [main, feature/wonderwood-explorer-mvp]
+    branches: [main, feature/wonderwood-explorer-mvp, preview/story-illustration-layout]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -30,11 +30,11 @@ jobs:
       - run: node scripts/publication-gate.mjs
         if: github.ref == 'refs/heads/main'
       - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/story-illustration-layout'
         with:
           path: dist
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/story-illustration-layout'
     needs: validate
     permissions:
       pages: write
