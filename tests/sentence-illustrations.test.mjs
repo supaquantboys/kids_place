@@ -17,8 +17,13 @@ test('sentence illustration assets use the required 4:3 project dimensions',asyn
 
 test('Story Time source includes sentence-level artwork and an image fallback',async()=>{
  const source=await readFile('src/app.mjs','utf8');
+ const css=await readFile('app.css','utf8');
  assert.match(source,/function sentenceArt\(/);
+ assert.match(source,/cover=sentenceArt\(s,0,0,fallback\)/);
  assert.match(source,/data-fallback/);
  assert.match(source,/fallbackTried/);
  assert.match(source,/class="sentence-card"/);
+ assert.match(css,/\.storybook \.narration-text\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+ assert.match(css,/\.sentence-card img\{display:block;width:100%;height:auto;aspect-ratio:4\/3/);
+ assert.match(css,/\.storybook>\.story-scene\{display:none\}/);
 });
