@@ -19,5 +19,6 @@ test('Story Time source includes sentence-level artwork and an image fallback',a
  const source=await readFile('src/app.mjs','utf8');
  assert.match(source,/function sentenceArt\(/);
  assert.match(source,/data-fallback/);
+ assert.match(source,/fallbackTried/);
  assert.match(source,/class="sentence-card"/);
 });
