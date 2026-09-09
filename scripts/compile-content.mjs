@@ -4,6 +4,7 @@ import {glossGroups,pictograms,coreExamples,phonics} from '../content/word-suppo
 import {beaverQuestions} from '../content/beaver-questions.mjs';
 import {authoredQuestions} from '../content/authored-questions.mjs';
 import {additionalExamples} from '../content/word-examples.mjs';
+import {bedtimeStories} from '../content/bedtime-stories.mjs';
 const spec = await readFile('docs/Kids_Place_Game_Concept.md','utf8');
 const appendix = spec.split('## Appendix A')[1].split('## Appendix B')[0];
 const rows = appendix.split('\n').filter(x=>/^\| (?:\d{2} —|[1-6] \|)/.test(x));
@@ -57,6 +58,6 @@ chapters.forEach((c,i)=>{
 });
 for(const word of words) if(!word.example) word.example=additionalExamples[word.id]||null;
 // Never fabricate reviewed images or sound metadata for incomplete entries.
-const registry={schemaVersion:1,contentVersion:'2026.09-alpha.2',releaseStatus:'editorial-and-audio-review-required',regions:regions.map((name,id)=>({id,name,icon:regionIcons[id]})),chapters,words,stories,questions,missions,phonics};
+const registry={schemaVersion:1,contentVersion:'2026.09-alpha.2',releaseStatus:'editorial-and-audio-review-required',regions:regions.map((name,id)=>({id,name,icon:regionIcons[id]})),chapters,words,stories,bedtimeStories,questions,missions,phonics};
 await mkdir('content',{recursive:true});await writeFile('content/catalog.json',JSON.stringify(registry,null,2)+'\n');
 console.log(JSON.stringify({words:words.length,chapters:chapters.length,stories:stories.length,versions:stories.length*3,missions:missions.length,questions:questions.length,manuallyAuthoredQuestions:questions.filter(q=>q.authorship==='manually-authored').length}));
