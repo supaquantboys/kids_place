@@ -27,12 +27,14 @@ const pngSize=async path=>{const b=await readFile(path);assert.equal(b.readUInt3
 
 test('sentence illustration assets use the required 4:3 project dimensions',async()=>{
  const stories=await readdir(root,{withFileTypes:true});
+ assert.equal(stories.filter(e=>e.isDirectory()).length,48);
  let total=0;
  for(const story of stories.filter(e=>e.isDirectory())){
   const files=(await readdir(`${root}/${story.name}`)).filter(f=>f.endsWith('.png'));
+  assert.equal(files.length,18,`${story.name} has exactly 18 sentence images`);
   for(const file of files){await pngSize(`${root}/${story.name}/${file}`);total++;}
  }
- assert.ok(total>=180,`expected at least the published illustration checkpoint, found ${total}`);
+ assert.equal(total,864);
 });
 
 test('Story Time source includes sentence-level artwork and an image fallback',async()=>{
@@ -40,5 +42,7 @@ test('Story Time source includes sentence-level artwork and an image fallback',a
  assert.match(source,/function sentenceArt\(/);
  assert.match(source,/data-fallback/);
  assert.match(source,/fallbackTried/);
- assert.match(source,/class="sentence-card"/);
+ assert.match(source,/id="story-sentence-art"/);
+ assert.match(source,/showStorySentence/);
+ assert.match(source,/data-sentence0/);
 });
