@@ -37,12 +37,17 @@ test('sentence illustration assets use the required 4:3 project dimensions',asyn
  assert.equal(total,864);
 });
 
-test('Story Time source includes sentence-level artwork and an image fallback',async()=>{
+test('Story Time renders a fitted illustration beside every sentence and uses unique story covers',async()=>{
  const source=await readFile('src/app.mjs','utf8');
  assert.match(source,/function sentenceArt\(/);
+ assert.match(source,/function storyCoverArt\(/);
+ assert.match(source,/class="book-cover story-cover"/);
+ assert.match(source,/class="sentence-card"/);
  assert.match(source,/data-fallback/);
  assert.match(source,/fallbackTried/);
- assert.match(source,/id="story-sentence-art"/);
  assert.match(source,/showStorySentence/);
- assert.match(source,/data-sentence0/);
+ assert.doesNotMatch(source,/id="story-sentence-art"/);
+ const css=await readFile('paint-theme.css','utf8');
+ assert.match(css,/\.story-cover img[^}]*object-fit: cover/s);
+ assert.match(css,/\.sentence-card img[^}]*aspect-ratio: 4 \/ 3[^}]*object-fit: contain/s);
 });
