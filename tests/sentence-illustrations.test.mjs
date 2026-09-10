@@ -50,4 +50,6 @@ test('Story Time renders a fitted illustration beside every sentence and uses un
  const css=await readFile('paint-theme.css','utf8');
  assert.match(css,/\.story-cover img[^}]*object-fit: cover/s);
  assert.match(css,/\.sentence-card img[^}]*aspect-ratio: 4 \/ 3[^}]*object-fit: contain/s);
+ const buildSource=await readFile('scripts/build.mjs','utf8');
+ assert.match(buildSource,/cp\('assets\/story-sentences','dist\/assets\/story-sentences',\{recursive:true\}\)/);
 });

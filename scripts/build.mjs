@@ -7,6 +7,7 @@ await mkdir('dist/content');
 await cp('content/catalog.json','dist/content/catalog.json');
 await mkdir('dist/assets');
 for(const name of ['world','beaver','treehouse','painted-paper']) await cp(`assets/${name}.webp`,`dist/assets/${name}.webp`);
+await cp('assets/story-sentences','dist/assets/story-sentences',{recursive:true});
 console.log('Static build complete. Relative asset paths support /kids_place/ on GitHub Pages.');
 
 await writeFile('dist/build-info.json', JSON.stringify({sha:process.env.GITHUB_SHA || 'local',channel:'preview'}));
