@@ -23,7 +23,7 @@ test('every tier maps each sentence to its matching story, page and image slot',
  }
  assert.equal(checked,1728);
 });
-const pngSize=async path=>{const b=await readFile(path);assert.equal(b.readUInt32BE(0),0x89504e47,'PNG signature');assert.equal(b.readUInt32BE(16),1448,`${path} width`);assert.equal(b.readUInt32BE(20),1086,`${path} height`);};
+const pngSize=async path=>{let b=await readFile(path);if(b.length<24)b=await readFile(path);assert.ok(b.length>=24,`${path} is truncated`);assert.equal(b.readUInt32BE(0),0x89504e47,'PNG signature');assert.equal(b.readUInt32BE(16),1448,`${path} width`);assert.equal(b.readUInt32BE(20),1086,`${path} height`);};
 
 test('sentence illustration assets use the required 4:3 project dimensions',async()=>{
  const stories=await readdir(root,{withFileTypes:true});
@@ -49,7 +49,11 @@ test('Story Time renders a fitted illustration beside every sentence and uses un
  assert.doesNotMatch(source,/id="story-sentence-art"/);
  const css=await readFile('paint-theme.css','utf8');
  assert.match(css,/\.story-cover img[^}]*object-fit: cover/s);
- assert.match(css,/\.sentence-card img[^}]*aspect-ratio: 4 \/ 3[^}]*object-fit: contain/s);
+ assert.match(css,/\.sentence-card img[^}]*height: clamp\(190px,22vw,270px\)[^}]*object-fit: cover/s);
+ assert.match(css,/\.sentence-storybook\[data-tier="sprout"\] \.sentence-card[^}]*grid-template-columns:/s);
+ assert.match(css,/\.sentence-storybook\[data-tier="sprout"\] \.sentence-card p[^}]*font-size: clamp\(1\.7rem/s);
+ assert.match(css,/\.sentence-storybook\[data-tier="trail"\] \.sentence-card p[^}]*font-size: clamp\(1\.5rem/s);
+ assert.match(css,/\.sentence-storybook\[data-tier="ranger"\] \.sentence-card p[^}]*font-size: clamp\(1\.35rem/s);
  const buildSource=await readFile('scripts/build.mjs','utf8');
  assert.match(buildSource,/cp\('assets\/story-sentences','dist\/assets\/story-sentences',\{recursive:true\}\)/);
 });
