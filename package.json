@@ -10,5 +10,10 @@
     "build": "node scripts/build.mjs",
     "audit:content": "node scripts/audit-content.mjs"
   },
-  "engines": {"node": ">=22"}
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.4"
+  }
 }

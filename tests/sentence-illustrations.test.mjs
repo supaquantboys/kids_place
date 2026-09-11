@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {runInNewContext} from 'node:vm';
 import {scripts} from '../content/story-scripts.mjs';
 import {readdir,readFile,access} from 'node:fs/promises';
+import sharp from 'sharp';
+import {renderStoryVariant} from '../scripts/story-image-pipeline.mjs';
 
 const root='assets/story-sentences';
 test('every tier maps each sentence to its matching story, page and image slot',async()=>{
@@ -37,10 +39,22 @@ test('sentence illustration assets use the required 4:3 project dimensions',asyn
  assert.equal(total,864);
 });
 
+test('responsive story optimizer preserves 4:3 detail in WebP output',async()=>{
+ const source=`${root}/ch01-a/p01-s01.png`,original=await readFile(source);
+ const output=await renderStoryVariant(source,480),metadata=await sharp(output).metadata();
+ assert.equal(metadata.format,'webp');
+ assert.equal(metadata.width,480);
+ assert.equal(metadata.height,360);
+ assert.ok(output.length<original.length/2,'responsive WebP is materially smaller than its PNG source');
+});
+
 test('Story Time renders a fitted illustration beside every sentence and uses unique story covers',async()=>{
  const source=await readFile('src/app.mjs','utf8');
  assert.match(source,/function sentenceArt\(/);
  assert.match(source,/function storyCoverArt\(/);
+ assert.match(source,/function storyImage\(/);
+ assert.match(source,/srcset=/);
+ assert.match(source,/decoding="async"/);
  assert.match(source,/class="book-cover story-cover"/);
  assert.match(source,/class="sentence-card"/);
  assert.match(source,/data-fallback/);
@@ -55,5 +69,6 @@ test('Story Time renders a fitted illustration beside every sentence and uses un
  assert.match(css,/\.sentence-storybook\[data-tier="trail"\] \.sentence-card p[^}]*font-size: clamp\(1\.5rem/s);
  assert.match(css,/\.sentence-storybook\[data-tier="ranger"\] \.sentence-card p[^}]*font-size: clamp\(1\.35rem/s);
  const buildSource=await readFile('scripts/build.mjs','utf8');
- assert.match(buildSource,/cp\('assets\/story-sentences','dist\/assets\/story-sentences',\{recursive:true\}\)/);
+ assert.match(buildSource,/buildStoryImages\('assets\/story-sentences','dist\/assets\/story-sentences'\)/);
+ assert.doesNotMatch(buildSource,/cp\('assets\/story-sentences'/);
 });

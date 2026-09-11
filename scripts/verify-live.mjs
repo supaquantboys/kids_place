@@ -13,6 +13,10 @@ for(let attempt=0;attempt<12;attempt++){
   assert.equal(info.channel,'preview');
   const html=await (await get('')).text();assert(html.includes('paint-theme.css'));
   for(const path of ['app.css','paint-theme.css','src/app.mjs','src/audio.mjs','src/progress.mjs','src/review.mjs','assets/world.webp','assets/beaver.webp','assets/treehouse.webp','assets/painted-paper.webp']) assert((await (await get(path)).arrayBuffer()).byteLength>0,path);
+  for(const path of ['assets/story-sentences/ch01-a/p01-s01-480.webp','assets/story-sentences/ch01-a/p01-s01-1200.webp']){
+   const response=await get(path),bytes=(await response.arrayBuffer()).byteLength;
+   assert.match(response.headers.get('content-type')||'',/image\/webp/);assert(bytes>10_000&&bytes<750_000,`${path} optimized size`);
+  }
   const c=await (await get('content/catalog.json')).json();
   assert.equal(c.chapters.length,24);assert(c.words.length>=600);assert.equal(c.stories.length,48);assert(c.questions.length>=960);
   console.log(JSON.stringify({url:base,sha:info.sha,channel:info.channel,chapters:c.chapters.length,words:c.words.length,stories:c.stories.length,questions:c.questions.length,assets:'all verified HTTP 200'}));
